@@ -12,7 +12,7 @@ export interface ICountry {
 }
 
 export interface ITimezone {
-  utcOverflow: number;
+  utcOverflow: string;
   time: string;
 }
 

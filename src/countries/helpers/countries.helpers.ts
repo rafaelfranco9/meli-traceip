@@ -1,4 +1,6 @@
+import { ICurrencies } from 'src/currencies/interfaces';
 import { coordinate } from 'src/geolocation/interfaces';
+import { ITimezone } from '../interfaces';
 
 export function CalculateDistanceInKm(
   coordinate1: coordinate,
@@ -28,4 +30,44 @@ export function CalculateDistanceInKm(
 
 export function degreesToRadians(degrees: number) {
   return (degrees * Math.PI) / 180;
+}
+
+export function convertToCurrency(
+  apiCurrencyProperty: Record<string, { name: string; symbol: string }>,
+): ICurrencies[] {
+  return Object.entries(apiCurrencyProperty).reduce((acc, [code, details]) => {
+    const newCurrency: ICurrencies = {
+      code,
+      name: details.name,
+      symbol: details.symbol,
+      usdRate: 0,
+    };
+    return [newCurrency, ...acc];
+  }, [] as ICurrencies[]);
+}
+
+export function getUTCtime(apiTimezone: string): ITimezone {
+  const date = new Date();
+  const overflowInMilliseconds = convertTimeToMilliseconds(apiTimezone);
+  const time = new Date(
+    date.setTime(date.getTime() + overflowInMilliseconds),
+  ).toISOString();
+  const timeFormatted = time.split('T')[1].split('.')[0];
+  const timezone: ITimezone = {
+    utcOverflow: apiTimezone,
+    time: timeFormatted,
+  };
+  return timezone;
+}
+
+export function convertTimeToMilliseconds(utctime: string): number {
+  if (utctime.length > 3) {
+    const time = utctime.slice(utctime.length - 5, utctime.length);
+    const hours = +time.split(':')[0] * 60 * 60 * 1000;
+    const minutes = +time.split(':')[1] * 60 * 1000;
+    const totalMilliseconds = hours + minutes;
+    if (utctime.charAt(3) == '-') return -totalMilliseconds;
+    return totalMilliseconds;
+  }
+  return 0;
 }
