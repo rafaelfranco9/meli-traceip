@@ -1,10 +1,10 @@
 import { HttpModule } from '@nestjs/axios';
-import { Module } from '@nestjs/common';
+import { CacheModule, Module } from '@nestjs/common';
 import { CurrenciesService } from './currencies.service';
 
 @Module({
-  imports:[HttpModule],
+  imports: [HttpModule, CacheModule.register({ ttl: 60 })],
   providers: [CurrenciesService],
-  exports:[CurrenciesService]
+  exports: [CurrenciesService],
 })
 export class CurrenciesModule {}
