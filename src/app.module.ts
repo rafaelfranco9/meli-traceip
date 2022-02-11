@@ -1,10 +1,21 @@
-import { Module } from '@nestjs/common';
+import { CacheModule, Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { GeolocationModule } from './geolocation/geolocation.module';
+import { CountriesModule } from './countries/countries.module';
+import { CurrenciesModule } from './currencies/currencies.module';
 
 @Module({
-  imports: [],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: `.env.${process.env.NODE_ENV}`,
+    }),
+    CacheModule.register({ ttl: 0 }),
+    GeolocationModule,
+    CountriesModule,
+    CurrenciesModule,
+  ],
   controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}
