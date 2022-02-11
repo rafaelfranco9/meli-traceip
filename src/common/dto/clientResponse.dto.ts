@@ -17,7 +17,7 @@ export class ClientResponseDto {
     this.distance = {
       from: originCoordinates,
       to: country.coordinates,
-      distance: CalculateDistanceInKm(originCoordinates, country.coordinates),
+      distanceInKm: CalculateDistanceInKm(originCoordinates, country.coordinates),
     };
   }
 }

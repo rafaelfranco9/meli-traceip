@@ -1,7 +1,7 @@
 export interface IDistance {
   from: coordinate;
   to: coordinate;
-  distance: number;
+  distanceInKm: number;
 }
 
 export type coordinate = [number, number];
