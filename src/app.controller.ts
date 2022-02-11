@@ -16,12 +16,15 @@ import { ICountry } from './countries/interfaces';
 import { ClientResponseDto } from './common/dto/clientResponse.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Events } from './statistics/enums/events';
+import { get } from 'http';
+import { StatisticsService } from './statistics/statistics.service';
 @Controller()
 export class AppController {
   constructor(
     private geolocationService: GeolocationService,
     private countriesService: CountriesService,
     private currenciesService: CurrenciesService,
+    private statisticsService:StatisticsService,
     private eventEmitter: EventEmitter2,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
@@ -55,4 +58,10 @@ export class AppController {
       throw new NotFoundException(err.message);
     }
   }
+
+  @Get('statistics')
+  getStatistics(){
+    return this.statisticsService.getStatistics();
+  }
+
 }

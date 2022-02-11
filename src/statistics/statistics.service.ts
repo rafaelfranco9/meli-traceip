@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { ClientResponseDto } from 'src/common/dto/clientResponse.dto';
 import { Events } from './enums/events';
-import { ICountryStatistics } from './interfaces';
+import { ICountryStatistics, IStatisticsDto } from './interfaces';
 
 @Injectable()
 export class StatisticsService {
@@ -25,11 +25,30 @@ export class StatisticsService {
       this.countriesStatistics[msg.distance.distanceInKm] = {
         name: msg.country.commonName,
         requests: 1,
+        distanceInKm: msg.distance.distanceInKm,
       };
     }
     this.updateMaxDistance(msg.distance.distanceInKm);
     this.updateMinDistance(msg.distance.distanceInKm);
     this.updateAverageDistance();
+  }
+
+  getStatistics(): IStatisticsDto | null {
+    if (Object.keys(this.countriesStatistics).length > 1) {
+      return {
+        maxDistance: this.countriesStatistics[this.maxDistance],
+        minDistance: this.countriesStatistics[this.minDistance],
+        averageDistanceInKm: this.averageDistanceInKm,
+      };
+    } else {
+      throw new NotFoundException(
+        'No statistics yet, the service needs at least 2 different IP address to compare',
+      );
+    }
+  }
+
+  getAllRequestDistances() {
+    return this.countriesStatistics;
   }
 
   updateMaxDistance(newDistance: number) {
