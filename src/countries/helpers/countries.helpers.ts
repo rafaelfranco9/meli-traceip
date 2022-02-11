@@ -25,7 +25,7 @@ export function CalculateDistanceInKm(
   const c = 2 * Math.asin(Math.sqrt(a));
   const distance = EARTH_RADIUS_KM * c;
 
-  return distance;
+  return +distance.toFixed(0);
 }
 
 export function degreesToRadians(degrees: number) {
@@ -70,4 +70,8 @@ export function convertTimeToMilliseconds(utctime: string): number {
     return totalMilliseconds;
   }
   return 0;
+}
+
+export function formatDateTime(date: Date): string {
+  return date.toISOString().replace('T', ' ').replace(/\..+/, '');
 }
