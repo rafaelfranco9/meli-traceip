@@ -1,57 +1,80 @@
 import { HttpService } from '@nestjs/axios';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  CACHE_MANAGER,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { catchError, map, Observable, throwError } from 'rxjs';
+import { Cache } from 'cache-manager';
+import { catchError, lastValueFrom, map, throwError } from 'rxjs';
 import { CurrencyCodes } from './enums';
+import { ICurrencies } from './interfaces';
 
 @Injectable()
 export class CurrenciesService {
   private API_DATA;
   private ACCESS_KEY;
+  private CACHE_RATES_KEY: string = 'RATES';
   constructor(
     private httpService: HttpService,
     private configService: ConfigService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {
     this.API_DATA = this.configService.get('API_FIXER');
     this.ACCESS_KEY = this.configService.get('FIXER_ACCESS_KEY');
   }
 
-  getExchangeRateInUsd(currencyCode: string): Observable<number | null> {
-    return this.httpService
-      .get(
-        `${this.API_DATA}/latest?access_key=${this.ACCESS_KEY}&symbols=${CurrencyCodes.USD},${currencyCode}`,
-      )
-      .pipe(
-        map((response) => {
-          if (response.status == HttpStatus.OK) {
-            return response.data;
-          } else {
-            throwError(() => new Error('Error requesting exchange data'));
-          }
-        }),
-        map((data) => {
-          if (currencyCode == CurrencyCodes.USD) return 1;
-          return this.calculateExchangeRateInUsd(currencyCode, data.rates);
-        }),
-        catchError((err) => {
-          return throwError(
-            () => new HttpException(err.message, HttpStatus.NOT_FOUND),
-          );
-        }),
-      );
+  async setUsdRates(currencies: ICurrencies[]) {
+    let rates = await this.cacheManager.get(this.CACHE_RATES_KEY);
+    if (!rates) {
+      rates = await this.getLastestRates();
+    }
+    currencies.map((currency) => {
+      if (currency.code == CurrencyCodes.USD) {
+        currency.usdRate = 1;
+      } else if (
+        rates[currency.code] != null &&
+        rates[CurrencyCodes.USD] != null
+      ) {
+        currency.usdRate = this.calculateExchangeRateInUsd(
+          rates[CurrencyCodes.USD],
+          rates[currency.code],
+        );
+      }
+    });
   }
 
-  calculateExchangeRateInUsd(
-    currencyCode: string,
-    EURBaseRates: number | null,
-  ) {
-    const code = currencyCode.toUpperCase();
-    if (EURBaseRates[code] != null && EURBaseRates[CurrencyCodes.USD] != null) {
-      const usdRate = 1 / EURBaseRates[CurrencyCodes.USD];
-      const currencyRate = usdRate * EURBaseRates[code];
-      const exchangeRate = 1 / currencyRate;
-      return exchangeRate;
-    }
-    return null;
+  async getLastestRates(): Promise<Record<string, number>> {
+    return await lastValueFrom(
+      this.httpService
+        .get(`${this.API_DATA}/latest?access_key=${this.ACCESS_KEY}`)
+        .pipe(
+          map((response) => {
+            if (response.status == HttpStatus.OK) {
+              return response.data.rates;
+            } else {
+              throwError(() => new Error('Error requesting exchange data'));
+            }
+          }),
+          map((rates) => {
+            this.cacheManager.set(this.CACHE_RATES_KEY, rates);
+            return rates;
+          }),
+          catchError((err) => {
+            return throwError(
+              () => new HttpException(err.message, HttpStatus.NOT_FOUND),
+            );
+          }),
+        ),
+    );
+  }
+
+  calculateExchangeRateInUsd(usdRate: number, currencyRate: number) {
+    const usd = 1 / usdRate;
+    const currRate = usd * currencyRate;
+    const exchangeRate = 1 / currRate;
+    return +exchangeRate.toFixed(5);
   }
 }
