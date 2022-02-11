@@ -1,4 +1,4 @@
-import { coordinate } from '../interfaces';
+import { coordinate } from 'src/geolocation/interfaces';
 
 export function CalculateDistanceInKm(
   coordinate1: coordinate,
