@@ -1,5 +1,5 @@
 import { ICurrencies } from 'src/currencies/interfaces';
-import { coordinate } from 'src/geolocation/interfaces';
+import { Coordinates } from 'src/geolocation/types';
 import { convertToCurrency, getUTCtime } from '../helpers/countries.helpers';
 import { ICountry, ITimezone } from '../interfaces';
 
@@ -10,7 +10,7 @@ export class CountryResponseDto implements ICountry {
   languages: Record<string, string>;
   timezones: ITimezone[];
   currencies: ICurrencies[];
-  coordinates: coordinate;
+  coordinates: Coordinates;
 
   constructor(body: any) {
     this.spanishName = body.translations.spa.common;

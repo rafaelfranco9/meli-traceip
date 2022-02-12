@@ -1,10 +1,10 @@
 import { ICurrencies } from 'src/currencies/interfaces';
-import { coordinate } from 'src/geolocation/interfaces';
+import { Coordinates } from 'src/geolocation/types';
 import { ITimezone } from '../interfaces';
 
 export function CalculateDistanceInKm(
-  coordinate1: coordinate,
-  coordinate2: coordinate,
+  coordinate1: Coordinates,
+  coordinate2: Coordinates,
 ) {
   const EARTH_RADIUS_KM = 6371;
 
