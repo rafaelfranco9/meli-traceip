@@ -13,7 +13,7 @@ export class ClientResponseDto {
   public distance: IDistance;
   constructor(ip: string, country: ICountry, originCoordinates: Coordinates) {
     this.ip = ip;
-    this.date = formatDateTime(new Date());
+    this.date = `${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`;
     this.country = { ...country };
     this.distance = {
       from: originCoordinates,

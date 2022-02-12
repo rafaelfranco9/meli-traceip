@@ -1,0 +1,111 @@
+body {
+    background-color: #3C3C3C;
+    font-family:'Raleway', sans-serif;
+    padding: 0px 15px 0px 15px;
+}
+
+.nav {
+    padding: 10px 0px 15px 0px;
+}
+
+h1{
+    color: #10D1FF;
+    font-size: 40px;
+}
+.main{
+    display: flex;
+    
+}
+.left{
+    flex: 1;
+}
+.right{
+    flex: 2;
+}
+.box{
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.input{
+    font-family: 'Source Code Pro', monospace;
+    font-size: large;
+    background-color: #FAFAFA;
+    padding: 20px;
+    border: none;
+    border-radius: 8px;
+    width: 250px;
+    margin-bottom: 8px;
+}
+.btn{
+    background-color: #FAFAFA;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Source Code Pro', monospace;
+}
+.formLabel{
+    margin-bottom: 5px;
+    color: white;
+    font-size: large;
+}
+.error{
+    margin-top: 5px;
+    color: #FF4D36;
+    font-size: small;
+}
+
+.infoFont{
+    font-family: 'Source Code Pro', monospace;
+    margin-top: 10px;
+    color: #006D9D;
+    font-size: large;
+}
+.info-card {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 25px;
+    background-color: #FAFAFA;
+    border-radius: 8px;
+    width: 80%;
+}
+
+#loading {
+    display:none;
+    background: url('loading.gif') no-repeat center center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: 9999999;
+}
+
+.statsContainer{
+    width: 80%;
+    display: flex;
+    flex-direction: row;
+    margin-top: 10px;
+    display: none;
+}
+.cards{
+    flex: 1;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    margin-right: 10px;
+    background-color: #FAFAFA;
+    border-radius: 8px;
+    padding: 50px 8px;
+}
+.statsText{
+    font-family: 'Source Code Pro', monospace;
+    color: #006D9D;
+    margin-bottom: 5px;
+    text-align: center;
+    font-size: 16px;
+}

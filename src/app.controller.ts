@@ -1,10 +1,13 @@
 import {
+  Body,
   CACHE_MANAGER,
   Controller,
   Get,
   Inject,
   NotFoundException,
   Param,
+  Post,
+  Render,
 } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { lastValueFrom } from 'rxjs';
@@ -24,7 +27,7 @@ export class AppController {
     private geolocationService: GeolocationService,
     private countriesService: CountriesService,
     private currenciesService: CurrenciesService,
-    private statisticsService:StatisticsService,
+    private statisticsService: StatisticsService,
     private eventEmitter: EventEmitter2,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
@@ -43,7 +46,7 @@ export class AppController {
         this.cacheManager.set(ip, country);
       }
 
-      await this.currenciesService.setUsdRates(country.currencies);
+      //await this.currenciesService.setUsdRates(country.currencies);
 
       const ClientResponse = new ClientResponseDto(
         ip,
@@ -60,8 +63,11 @@ export class AppController {
   }
 
   @Get('statistics')
-  getStatistics(){
+  getStatistics() {
     return this.statisticsService.getStatistics();
   }
 
+  @Get()
+  @Render('index')
+  root() {}
 }
