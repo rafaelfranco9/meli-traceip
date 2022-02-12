@@ -1,8 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { ClientResponseDto } from 'src/common/dto/clientResponse.dto';
+import { IStatisticsDto } from './dto/statistics.dto';
 import { Events } from './enums/events';
-import { ICountryStatistics, IStatisticsDto } from './interfaces';
+import { ICountryStatistics } from './interfaces';
 
 @Injectable()
 export class StatisticsService {
