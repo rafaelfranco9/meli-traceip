@@ -1,16 +1,10 @@
 import {
-  Body,
-  CACHE_MANAGER,
   Controller,
   Get,
-  Inject,
   NotFoundException,
   Param,
-  Post,
   Render,
 } from '@nestjs/common';
-import { Cache } from 'cache-manager';
-import { lastValueFrom } from 'rxjs';
 import { COORDINATES } from './countries/constants';
 import { CountriesService } from './countries/countries.service';
 import { CurrenciesService } from './currencies/currencies.service';
@@ -19,8 +13,9 @@ import { ICountry } from './countries/interfaces';
 import { ClientResponseDto } from './common/dto/clientResponse.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Events } from './statistics/enums/events';
-import { get } from 'http';
 import { StatisticsService } from './statistics/statistics.service';
+import { CalculateCoordenatesDistanceInKm } from './countries/helpers';
+import { HttpMessages } from './common/enums/exceptions.enums';
 @Controller()
 export class AppController {
   constructor(
@@ -29,34 +24,27 @@ export class AppController {
     private currenciesService: CurrenciesService,
     private statisticsService: StatisticsService,
     private eventEmitter: EventEmitter2,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   @Get('ip/:ip')
   async getCountryInformation(@Param('ip') ip: string): Promise<any> {
     try {
-      let country: ICountry = await this.cacheManager.get(ip);
-      if (!country) {
-        const { countryCode } = await lastValueFrom(
-          this.geolocationService.getCountryByIp(ip),
-        );
-        country = await lastValueFrom(
-          this.countriesService.getCountryInformation(countryCode),
-        );
-        this.cacheManager.set(ip, country);
-      }
+      const {countryCode} = await this.geolocationService.getCountryCodeByIp(ip);
+      if(!countryCode) throw new NotFoundException(HttpMessages.IP_NOT_FOUND);
 
-      //await this.currenciesService.setUsdRates(country.currencies);
+      const country:ICountry = await this.countriesService.getCountryInformation(countryCode);
+      if(!country) throw new NotFoundException(HttpMessages.COUNTRY_NOT_FOUND);
 
-      const ClientResponse = new ClientResponseDto(
-        ip,
-        country,
-        COORDINATES.ARGENTINA,
-      );
-
-      this.eventEmitter.emit(Events.NEW_COUNTRY_REQUEST, ClientResponse);
-
-      return ClientResponse;
+      country.currencies = await this.currenciesService.getCurrenciesWithUsdRate([...country.currencies]);
+      
+      const from = COORDINATES.ARGENTINA;
+      const to = country.coordinates;
+      const distanceInKm = CalculateCoordenatesDistanceInKm(from,to);
+      
+      const response = new ClientResponseDto(ip,country,{distanceInKm,from,to});
+      this.eventEmitter.emit(Events.NEW_COUNTRY_REQUEST,response);
+      
+      return response;
     } catch (err) {
       throw new NotFoundException(err.message);
     }
@@ -65,6 +53,11 @@ export class AppController {
   @Get('statistics')
   getStatistics() {
     return this.statisticsService.getStatistics();
+  }
+
+  @Get('statistics/all')
+  getAllStatistics() {
+    return this.statisticsService.getAllRequestDistances();
   }
 
   @Get()

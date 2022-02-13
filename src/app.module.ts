@@ -1,4 +1,4 @@
-import { CacheModule, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { GeolocationModule } from './geolocation/geolocation.module';
@@ -14,7 +14,6 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
       envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
     EventEmitterModule.forRoot({ global: true }),
-    CacheModule.register({ ttl: 0 }),
     GeolocationModule,
     CountriesModule,
     CurrenciesModule,
