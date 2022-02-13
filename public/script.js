@@ -1,3 +1,9 @@
+
+$( document ).ready(function() {
+    requestAllStats();
+    requestStats();
+});
+
 async function submit() {
   $('#loading').show();
   let ip = $('#ip').val();
@@ -9,10 +15,13 @@ async function submit() {
       if (data.statusCode != 404) {
         showData(data);
         requestStats();
+        requestAllStats();
+        $('#ip').val('');
       } else {
         $('#error').text('Ingresaste una IP invalida o no existente');
       }
     } catch (err) {
+      $('#error').text('Error haciendo peticion');
       console.log(err);
     }
   } else {
@@ -62,6 +71,28 @@ function showStats(data) {
   $('#average-distance').text(`${data.averageDistanceInKm} Kms`);
   $('#stats').css('display', 'flex');
 }
+
+function createTable(data){
+    if($('#table tbody').children().length > 0){
+        $('#table tbody').children().remove();
+    }
+    Object.entries(data).forEach(([key,value]) => {
+        $('#table tbody').append(`<tr><td>${value.name}</td><td>${value.distanceInKm}</td><td>${value.requests}</td></tr>`);
+    });
+}
+
+async function requestAllStats() {
+    try {
+      const response = await fetch('http://localhost:5000/statistics/all');
+      const data = await response.json();
+      if (data.statusCode != 404) {
+        createTable(data);
+      }
+    } catch (err) {
+      console.log(err);
+      $('#table').hide();
+    }
+  }
 
 function formatLanguage(languages) {
   return Object.entries(languages).reduce((acc, [key, value], i) => {

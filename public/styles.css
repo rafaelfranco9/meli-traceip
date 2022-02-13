@@ -27,6 +27,7 @@ h1{
     align-items: flex-start;
     flex-direction: column;
     justify-content: space-between;
+    margin-bottom: 20px;
 }
 
 .input{
@@ -108,4 +109,27 @@ h1{
     margin-bottom: 5px;
     text-align: center;
     font-size: 16px;
+}
+.table-container{
+    margin-top: 4px;
+    display: flex;
+    width: 80%;
+    padding: 15px;
+    border-radius: 8px;
+    background-color: #FAFAFA;
+}
+.table{
+    width: 100%;
+    text-align: left;
+    font-family: 'Source Code Pro', monospace;
+}
+td{
+    padding: 8px 0px;
+    vertical-align: middle;
+    border-bottom: 1px solid #ddd;
+    font-size: small;
+}
+th{
+    padding: 10px 0px;
+    font-size: small;
 }
