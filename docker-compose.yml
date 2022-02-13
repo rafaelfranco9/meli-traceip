@@ -2,6 +2,7 @@ version: "3"
 
 services:
   meli-traceip-app:
+    container_name: meli-traceip-app
     image: nestjs-api-meli-traceip
     build:
         context: .
