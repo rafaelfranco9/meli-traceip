@@ -32,8 +32,9 @@ export class GeolocationService {
             map((response) => {
               const { status, data } = response;
               if (status == HttpStatus.OK) {
-                this.cacheManager.set(ip, code);
-                return new GeolocationResponseDto(data);
+                const geoResponse = new GeolocationResponseDto(data);
+                this.cacheManager.set(ip, geoResponse);
+                return geoResponse;
               }
               return null;
             }),
