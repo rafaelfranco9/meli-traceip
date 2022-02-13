@@ -3,7 +3,7 @@ import { CacheModule, Module } from '@nestjs/common';
 import { CurrenciesService } from './currencies.service';
 
 @Module({
-  imports: [HttpModule, CacheModule.register({ ttl: 60 * 60 })],
+  imports: [HttpModule, CacheModule.register({ ttl: 3600 })],
   providers: [CurrenciesService],
   exports: [CurrenciesService],
 })

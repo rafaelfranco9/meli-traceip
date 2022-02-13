@@ -1,19 +1,23 @@
 import {
   CACHE_MANAGER,
-  HttpException,
   HttpStatus,
   Inject,
   Injectable,
+  Logger,
 } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { catchError, lastValueFrom, map, Observable, throwError } from 'rxjs';
+import {
+  firstValueFrom,
+} from 'rxjs';
 import { ConfigService } from '@nestjs/config';
 import { GeolocationResponseDto } from './dto/geolocationResponse.dto';
 import { Cache } from 'cache-manager';
+import { HttpMessages } from 'src/common/enums/exceptions.enums';
 
 @Injectable()
 export class GeolocationService {
   private API_DATA: string;
+  private logger = new Logger(GeolocationService.name);
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
@@ -23,33 +27,21 @@ export class GeolocationService {
   }
 
   async getCountryCodeByIp(ip: string): Promise<GeolocationResponseDto | null> {
-    let code = await this.cacheManager.get<GeolocationResponseDto>(ip);
-    if (!code) {
-      code = await lastValueFrom(
-        this.httpService
-          .get<GeolocationResponseDto | null>(`${this.API_DATA}/ip?${ip}`)
-          .pipe(
-            map((response) => {
-              const { status, data } = response;
-              if (status == HttpStatus.OK) {
-                const geoResponse = new GeolocationResponseDto(data);
-                this.cacheManager.set(ip, geoResponse);
-                return geoResponse;
-              }
-              return null;
-            }),
-            catchError((error) => {
-              return throwError(
-                () =>
-                  new HttpException(
-                    error.message || 'Error requesting data to api',
-                    error.response.status || HttpStatus.NOT_FOUND,
-                  ),
-              );
-            }),
-          ),
+    try {
+      let code = await this.cacheManager.get<GeolocationResponseDto>(ip);
+      if (code) return code;
+
+      const { status, data } = await firstValueFrom(
+        this.httpService.get(`${this.API_DATA}/ip?${ip}`),
       );
+      if (status === HttpStatus.OK) {
+        const geoResponse = new GeolocationResponseDto(data);
+        await this.cacheManager.set(ip, geoResponse);
+        return geoResponse;
+      }
+    } catch (err) {
+      this.logger.log(HttpMessages.IP_NOT_FOUND);
     }
-    return code;
+    return null;
   }
 }

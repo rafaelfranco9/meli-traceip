@@ -5,7 +5,7 @@ import {
   Param,
   Render,
 } from '@nestjs/common';
-import { COORDINATES } from './countries/constants';
+import { COORDINATES } from './countries/constants/coordenates.constants';
 import { CountriesService } from './countries/countries.service';
 import { CurrenciesService } from './currencies/currencies.service';
 import { GeolocationService } from './geolocation/geolocation.service';
@@ -16,6 +16,7 @@ import { Events } from './statistics/enums/events';
 import { StatisticsService } from './statistics/statistics.service';
 import { CalculateCoordenatesDistanceInKm } from './countries/helpers';
 import { HttpMessages } from './common/enums/exceptions.enums';
+
 @Controller()
 export class AppController {
   constructor(
@@ -29,10 +30,10 @@ export class AppController {
   @Get('ip/:ip')
   async getCountryInformation(@Param('ip') ip: string): Promise<any> {
     try {
-      const {countryCode} = await this.geolocationService.getCountryCodeByIp(ip);
-      if(!countryCode) throw new NotFoundException(HttpMessages.IP_NOT_FOUND);
+      const countryGeolocation = await this.geolocationService.getCountryCodeByIp(ip);
+      if(!countryGeolocation) throw new NotFoundException(HttpMessages.IP_NOT_FOUND);
 
-      const country:ICountry = await this.countriesService.getCountryInformation(countryCode);
+      const country:ICountry = await this.countriesService.getCountryInformation(countryGeolocation.countryCode);
       if(!country) throw new NotFoundException(HttpMessages.COUNTRY_NOT_FOUND);
 
       country.currencies = await this.currenciesService.getCurrenciesWithUsdRate([...country.currencies]);

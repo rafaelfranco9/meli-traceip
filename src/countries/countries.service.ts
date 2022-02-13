@@ -1,19 +1,23 @@
 import { HttpService } from '@nestjs/axios';
 import {
   CACHE_MANAGER,
-  HttpException,
   HttpStatus,
   Inject,
   Injectable,
+  Logger,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Cache } from 'cache-manager';
-import { catchError, lastValueFrom, map, throwError } from 'rxjs';
+import {
+  firstValueFrom,
+} from 'rxjs';
+import { HttpMessages } from 'src/common/enums/exceptions.enums';
 import { CountryResponseDto } from './dto/countryResponse.dto';
 
 @Injectable()
 export class CountriesService {
   private API_DATA;
+  private logger = new Logger(CountriesService.name);
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
@@ -25,34 +29,24 @@ export class CountriesService {
   async getCountryInformation(
     countryCode: string,
   ): Promise<CountryResponseDto | null> {
-    let countryData = await this.cacheManager.get<CountryResponseDto>(
-      countryCode,
-    );
-    if (!countryData) {
-      countryData = await lastValueFrom(
-        this.httpService.get(`${this.API_DATA}/${countryCode}`).pipe(
-          map((response) => {
-            const { status, data } = response;
-            if (status == HttpStatus.OK && data.length > 0) {
-              const countryResponse = new CountryResponseDto(data[0]);
-              this.cacheManager.set(countryCode, countryResponse);
-              return countryResponse;
-            }
-            return null;
-          }),
-          catchError((error) => {
-            return throwError(
-              () =>
-                new HttpException(
-                  error.message || 'Error requesting data to api',
-                  error.status || HttpStatus.NOT_FOUND,
-                ),
-            );
-          }),
-        ),
+    try {
+      let countryData = await this.cacheManager.get<CountryResponseDto>(
+        countryCode,
       );
+      if (countryData) return countryData;
+
+      const { status, data } = await firstValueFrom(
+        this.httpService.get(`${this.API_DATA}/${countryCode}`),
+      );
+      if (status === HttpStatus.OK && data?.length > 0) {
+        const countryResponse = new CountryResponseDto(data[0]);
+        await this.cacheManager.set(countryCode, countryResponse);
+        return countryResponse;
+      }
+    } catch (err) {
+      this.logger.log(HttpMessages.COUNTRY_NOT_FOUND);
     }
 
-    return countryData;
+    return null;
   }
 }

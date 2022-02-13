@@ -1,7 +1,6 @@
 import { HttpService } from '@nestjs/axios';
 import {
   CACHE_MANAGER,
-  HttpException,
   HttpStatus,
   Inject,
   Injectable,
@@ -9,7 +8,10 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Cache } from 'cache-manager';
-import { catchError, lastValueFrom, map, throwError } from 'rxjs';
+import {
+  firstValueFrom,
+} from 'rxjs';
+import { HttpMessages } from 'src/common/enums/exceptions.enums';
 import { CurrencyCodes } from './enums';
 import { calculateExchangeRateInUsd } from './helpers';
 import { ICurrencies } from './interfaces';
@@ -53,32 +55,24 @@ export class CurrenciesService {
   }
 
   async getExchangeRates(): Promise<Record<string, number> | null> {
-    let rates = await this.cacheManager.get<Record<string, number>>(
-      this.CACHE_RATES_KEY,
-    );
-    if (!rates) {
-      rates = await lastValueFrom(
-        this.httpService
-          .get(`${this.API_DATA}/latest?access_key=${this.ACCESS_KEY}`)
-          .pipe(
-            map((response) => {
-              if (response.status == HttpStatus.OK) {
-                return response.data.rates;
-              } else {
-                throwError(() => new Error('Error requesting exchange data'));
-              }
-            }),
-            map((rates) => {
-              this.cacheManager.set(this.CACHE_RATES_KEY, rates);
-              return rates;
-            }),
-            catchError((err) => {
-              this.logger.error(err.message);
-              return null;
-            }),
-          ),
+    try {
+      let rates = await this.cacheManager.get<Record<string, number>>(
+        this.CACHE_RATES_KEY,
       );
+      if (rates) return rates;
+
+      const { status, data } = await firstValueFrom(
+        this.httpService.get(
+          `${this.API_DATA}/latest?access_key=${this.ACCESS_KEY}`,
+        ),
+      );
+      if (status === HttpStatus.OK) {
+        await this.cacheManager.set(this.CACHE_RATES_KEY, data.rates);
+        return data.rates;
+      }
+    } catch (err) {
+      this.logger.log(HttpMessages.EXCHANGE_DATA_NOT_FOUND);
     }
-    return rates;
+    return null;
   }
 }
