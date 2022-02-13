@@ -1,6 +1,9 @@
 import { ICurrencies } from 'src/currencies/interfaces';
 import { Coordinates } from 'src/geolocation/types';
-import { convertToCurrency, getUTCtime } from '../helpers/countries.helpers';
+import {
+  convertToCurrency,
+  convertToTimezone,
+} from '../helpers/dto.helpers';
 import { ICountry, ITimezone } from '../interfaces';
 
 export class CountryResponseDto implements ICountry {
@@ -16,11 +19,9 @@ export class CountryResponseDto implements ICountry {
     this.spanishName = body.translations.spa.common;
     this.commonName = body.name.common;
     this.ISOcode = body.cca2;
-    this.currencies = convertToCurrency(body.currencies);
     this.coordinates = body.latlng;
     this.languages = body.languages;
-    this.timezones = body.timezones.map((time: string) =>
-      getUTCtime(time),
-    ) as ITimezone[];
+    this.currencies = convertToCurrency(body.currencies);
+    this.timezones = convertToTimezone(body.timezones);
   }
 }
