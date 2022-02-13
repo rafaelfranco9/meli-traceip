@@ -1,6 +1,6 @@
 import { Coordinates } from 'src/geolocation/types';
 
-export function CalculateDistanceInKm(
+export function CalculateCoordenatesDistanceInKm(
   coordinate1: Coordinates,
   coordinate2: Coordinates,
 ) {
