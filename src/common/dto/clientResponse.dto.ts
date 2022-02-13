@@ -1,27 +1,14 @@
-import {
-  CalculateDistanceInKm,
-  formatDateTime,
-} from 'src/countries/helpers/countries.helpers';
 import { ICountry } from 'src/countries/interfaces';
 import { IDistance } from 'src/geolocation/interfaces';
-import { Coordinates } from 'src/geolocation/types';
-
 export class ClientResponseDto {
   public ip: string;
   public date: string;
   public country: ICountry;
   public distance: IDistance;
-  constructor(ip: string, country: ICountry, originCoordinates: Coordinates) {
+  constructor(ip: string, country: ICountry, distance: IDistance) {
     this.ip = ip;
     this.date = `${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`;
-    this.country = { ...country };
-    this.distance = {
-      from: originCoordinates,
-      to: country.coordinates,
-      distanceInKm: CalculateDistanceInKm(
-        originCoordinates,
-        country.coordinates,
-      ),
-    };
+    this.country = country;
+    this.distance = distance;
   }
 }

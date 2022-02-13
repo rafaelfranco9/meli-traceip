@@ -1,6 +1,5 @@
 import { ICurrencies } from 'src/currencies/interfaces';
 import { Coordinates } from 'src/geolocation/types';
-
 import { ITimezone } from '.';
 
 export interface ICountry {
