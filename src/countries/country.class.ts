@@ -1,12 +1,13 @@
 import { ICurrencies } from 'src/currencies/interfaces';
 import { Coordinates } from 'src/geolocation/types';
+import { apiResponse } from './dto/apiResponse.dto';
 import {
   convertToCurrency,
   convertToTimezone,
-} from '../helpers/dto.helpers';
-import { ICountry, ITimezone } from '../interfaces';
+} from './helpers/dto.helpers';
+import { ICountry, ITimezone } from './interfaces';
 
-export class CountryResponseDto implements ICountry {
+export class Country implements ICountry {
   spanishName: string;
   commonName: string;
   ISOcode: string;
@@ -15,8 +16,8 @@ export class CountryResponseDto implements ICountry {
   currencies: ICurrencies[];
   coordinates: Coordinates;
 
-  constructor(body: any) {
-    this.spanishName = body.translations.spa.common;
+  constructor(body: apiResponse) {
+    this.spanishName = body.translations.spa.common || body.name.common;
     this.commonName = body.name.common;
     this.ISOcode = body.cca2;
     this.coordinates = body.latlng;

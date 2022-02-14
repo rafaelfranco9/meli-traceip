@@ -12,7 +12,8 @@ import {
   firstValueFrom,
 } from 'rxjs';
 import { HttpMessages } from 'src/common/enums/exceptions.enums';
-import { CountryResponseDto } from './dto/countryResponse.dto';
+import { Country } from './country.class';
+import { apiResponse } from './dto/apiResponse.dto';
 
 @Injectable()
 export class CountriesService {
@@ -28,18 +29,18 @@ export class CountriesService {
 
   async getCountryInformation(
     countryCode: string,
-  ): Promise<CountryResponseDto | null> {
+  ): Promise<Country | null> {
     try {
-      let countryData = await this.cacheManager.get<CountryResponseDto>(
+      let countryData = await this.cacheManager.get<Country>(
         countryCode,
       );
       if (countryData) return countryData;
 
       const { status, data } = await firstValueFrom(
-        this.httpService.get(`${this.API_DATA}/${countryCode}`),
+        this.httpService.get<apiResponse[]>(`${this.API_DATA}/${countryCode}`),
       );
       if (status === HttpStatus.OK && data?.length > 0) {
-        const countryResponse = new CountryResponseDto(data[0]);
+        const countryResponse = new Country(data[0]);
         await this.cacheManager.set(countryCode, countryResponse);
         return countryResponse;
       }
