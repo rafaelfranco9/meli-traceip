@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
-import { ClientResponseDto } from 'src/common/dto/clientResponse.dto';
+import { ClientResponseDto } from '../common/dto/clientResponse.dto';
 import { IStatisticsDto } from './dto/statistics.dto';
 import { Events } from './enums/events';
 import { ICountryStatistics } from './interfaces';
