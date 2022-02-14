@@ -11,7 +11,7 @@ import { Cache } from 'cache-manager';
 import {
   firstValueFrom,
 } from 'rxjs';
-import { HttpMessages } from 'src/common/enums/exceptions.enums';
+import { HttpMessages } from '../common/enums/exceptions.enums';
 import { CurrencyCodes } from './enums';
 import { calculateExchangeRateInUsd } from './helpers';
 import { ICurrencies } from './interfaces';
