@@ -1,6 +1,6 @@
 import { HttpModule } from '@nestjs/axios';
 import { CacheModule, Module } from '@nestjs/common';
-import { CurrenciesModule } from 'src/currencies/currencies.module';
+import { CurrenciesModule } from '../currencies/currencies.module';
 import { CountriesService } from './countries.service';
 
 @Module({
