@@ -4,6 +4,7 @@ services:
   meli-traceip-app:
     container_name: meli-traceip-app
     image: nestjs-api-meli-traceip
+    command: npm run start:dev
     build:
         context: .
         dockerfile: ./Dockerfile
