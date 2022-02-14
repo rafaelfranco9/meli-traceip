@@ -12,7 +12,8 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { GeolocationResponseDto } from './dto/geolocationResponse.dto';
 import { Cache } from 'cache-manager';
-import { HttpMessages } from 'src/common/enums/exceptions.enums';
+import { HttpMessages } from '../common/enums/exceptions.enums';
+
 
 @Injectable()
 export class GeolocationService {
