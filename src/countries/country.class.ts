@@ -1,10 +1,10 @@
+import { CurrencyCodes } from 'src/currencies/enums';
+import { calculateExchangeRateInUsd } from 'src/currencies/helpers';
 import { ICurrencies } from 'src/currencies/interfaces';
 import { Coordinates } from 'src/geolocation/types';
 import { apiResponse } from './dto/apiResponse.dto';
-import {
-  convertToCurrency,
-  convertToTimezone,
-} from './helpers/dto.helpers';
+import { getUTCtime } from './helpers';
+import { convertToCurrency, convertToTimezone } from './helpers/dto.helpers';
 import { ICountry, ITimezone } from './interfaces';
 
 export class Country implements ICountry {
@@ -24,5 +24,28 @@ export class Country implements ICountry {
     this.languages = body.languages;
     this.currencies = convertToCurrency(body.currencies);
     this.timezones = convertToTimezone(body.timezones);
+  }
+
+  updateTimezones() {
+    this.timezones = this.timezones.map((timezone) => {
+      return getUTCtime(timezone.utcOverflow);
+    });
+  }
+
+  updateCurrenciesExchangeRate(rates: Record<string, number>) {
+    this.currencies = this.currencies.map((currency) => {
+      if (currency.code == CurrencyCodes.USD) {
+        currency.usdRate = 1;
+      } else if (
+        rates[currency.code] != null &&
+        rates[CurrencyCodes.USD] != null
+      ) {
+        currency.usdRate = calculateExchangeRateInUsd(
+          rates[CurrencyCodes.USD],
+          rates[currency.code],
+        );
+      }
+      return currency;
+    });
   }
 }

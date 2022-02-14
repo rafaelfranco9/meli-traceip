@@ -11,7 +11,7 @@ import { Cache } from 'cache-manager';
 import {
   firstValueFrom,
 } from 'rxjs';
-import { HttpMessages } from 'src/common/enums/exceptions.enums';
+import { HttpMessages } from '../common/enums/exceptions.enums';
 import { Country } from './country.class';
 import { apiResponse } from './dto/apiResponse.dto';
 
@@ -34,7 +34,10 @@ export class CountriesService {
       let countryData = await this.cacheManager.get<Country>(
         countryCode,
       );
-      if (countryData) return countryData;
+      if (countryData) {
+        countryData.updateTimezones();
+        return countryData;
+      } 
 
       const { status, data } = await firstValueFrom(
         this.httpService.get<apiResponse[]>(`${this.API_DATA}/${countryCode}`),

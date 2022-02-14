@@ -33,10 +33,13 @@ export class AppController {
       const countryGeolocation = await this.geolocationService.getCountryCodeByIp(ip);
       if(!countryGeolocation) throw new NotFoundException(HttpMessages.IP_NOT_FOUND);
 
-      const country:ICountry = await this.countriesService.getCountryInformation(countryGeolocation.countryCode);
+      const country = await this.countriesService.getCountryInformation(countryGeolocation.countryCode);
       if(!country) throw new NotFoundException(HttpMessages.COUNTRY_NOT_FOUND);
 
-      country.currencies = await this.currenciesService.getCurrenciesWithUsdRate([...country.currencies]);
+      const rates = await this.currenciesService.getExchangeRates();
+      if(rates){
+        country.updateCurrenciesExchangeRate(rates);
+      }
       
       const from = COORDINATES.ARGENTINA;
       const to = country.coordinates;
