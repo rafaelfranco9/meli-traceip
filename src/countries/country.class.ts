@@ -1,7 +1,7 @@
-import { CurrencyCodes } from 'src/currencies/enums';
-import { calculateExchangeRateInUsd } from 'src/currencies/helpers';
-import { ICurrencies } from 'src/currencies/interfaces';
-import { Coordinates } from 'src/geolocation/types';
+import { CurrencyCodes } from '../currencies/enums';
+import { calculateExchangeRateInUsd } from '../currencies/helpers';
+import { ICurrencies } from '../currencies/interfaces';
+import { Coordinates } from '../geolocation/types';
 import { apiResponse } from './dto/apiResponse.dto';
 import { getUTCtime } from './helpers';
 import { convertToCurrency, convertToTimezone } from './helpers/dto.helpers';
