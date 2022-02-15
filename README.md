@@ -112,14 +112,14 @@ En el HTML tendremos un campo donde podemos ingresar una dirección IP con un bo
 ```sh
 {
   "maxDistance":{
-    name: String,
-    requests: Number,
-    distanceInKm: Number
+    "name": String,
+    "requests": Number,
+    "distanceInKm": Number
   },
   "minDistance":{
-    name: String,
-    requests: Number,
-    distanceInKm: Number
+    "name": String,
+    "requests": Number,
+    "distanceInKm": Number
   },
   "averageDistanceInKm": Number
 }
@@ -129,9 +129,9 @@ En el HTML tendremos un campo donde podemos ingresar una dirección IP con un bo
 ```sh
 {
   "[distance]":{
-    name: String,
-    requests: Number,
-    distanceInKm: Number
+    "name": String,
+    "requests": Number,
+    "distanceInKm": Number
   }
 }
 ```
