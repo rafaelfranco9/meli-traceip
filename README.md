@@ -61,66 +61,81 @@ ___
 El codigo desarrollado corresponde a una aplicación web que cuenta con los siguientes endpoints.
 | Método | Endpoint | Descripción |
 |--|--|--|
+|GET|/| Render de HTML
 |GET|/ip/{ipAddress}| Optener informacion de la IP
 |GET|/statistics| Optener estadisticas de maxima, minima y promedio de distancias
 |GET|/statistics/all| Optener todas las estadisticas de las distancias invocadas
 #
-### Ejemplo
+Al ingresar al root endpoint `/` se rendizará un HTML que nos permitirá interactuar con todos los demas endpoints de la aplicación.
 
-Si enviamos la siguiente direccion IP: *83.44.196.93* (que corresponde a españa)  al endpoint `/ip/{ipAddress}` tendremos como respuesta el siguiente objeto
-```json
+En el HTML tendremos un campo donde podemos ingresar una dirección IP con un boton "consultar". Una vez consultemos una, nos aparecera toda la informacion requerida para este desafio.
+
+### Esquemas
+
+`/ip/{ipAddress}` 
+```sh
 {
-	"ip": "83.44.196.93",
-	"date": "2/14/2022 10:55:35 PM",
+	"ip": String,
+	"date": String,
 	"country": {
-		"spanishName": "España",
-		"commonName": "Spain",
-		"ISOcode": "ES",
-		"coordinates": [
-			40,
-			-4
-		],
+		"spanishName": String,
+		"commonName": String,
+		"ISOcode": String,
+		"coordinates": String[],
 		"languages": {
-			"spa": "Spanish"
+			"spa": String
 		},
 		"currencies": [
 			{
-				"code": "EUR",
-				"name": "Euro",
-				"symbol": "€",
-				"usdRate": 1.13045
+				"code": String,
+				"name": String,
+				"symbol": String,
+				"usdRate": Number
 			}
 		],
 		"timezones": [
 			{
-				"utcOverflow": "UTC",
-				"time": "22:55:35"
+				"utcOverflow": String,
+				"time": String
 			},
-			{
-				"utcOverflow": "UTC+01:00",
-				"time": "23:55:35"
-			}
 		]
 	},
 	"distance": {
-		"distanceInKm": 10275,
-		"from": [
-			-34,
-			-64
-		],
-		"to": [
-			40,
-			-4
-		]
+		"distanceInKm": Number,
+		"from": Number[],
+		"to": Number[]
 	}
 }
 ```
-Esta información la veremos reflejada en nuestro navegador de la siguiente manera:
 
-![alt text](../meli-traceip/public/app-screenshot.png)
+`/ip/statistics` 
+```sh
+{
+  "maxDistance":{
+    name: String,
+    requests: Number,
+    distanceInKm: Number
+  },
+  "minDistance":{
+    name: String,
+    requests: Number,
+    distanceInKm: Number
+  },
+  "averageDistanceInKm": Number
+}
+```
+
+`/ip/statistics/all` 
+```sh
+{
+  "[distance]":{
+    name: String,
+    requests: Number,
+    distanceInKm: Number
+  }
+}
+```
 ---
-
-
 ## Dependencias
 
 
